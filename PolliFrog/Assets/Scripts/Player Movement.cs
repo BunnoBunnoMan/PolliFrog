@@ -9,6 +9,7 @@ public class PlayerMovement : MonoBehaviour
     private Vector2 movement;
     private bool yump = false;
     private bool yumping = false;
+    private Vector2 xMove;
     // Update is called once per frame
     void Update()
     {
@@ -24,7 +25,11 @@ public class PlayerMovement : MonoBehaviour
     {
         movement = Vector2.ClampMagnitude(movement, 1);
         rb.AddForce(movement * moveSpeed);
-        if (yump && yumping == false) rb.AddForceY(20 * moveSpeed);
+        //Debug.Log(movement * moveSpeed);
+        Debug.Log(rb.linearVelocityX);
+        if (yump && yumping == false) rb.AddForceY(5, ForceMode2D.Impulse);
+        if (rb.linearVelocityX > topSpeed) rb.linearVelocityX = topSpeed;
+        else if (rb.linearVelocityX < -topSpeed) rb.linearVelocityX = -topSpeed;
     }
 
     public void OnCollisionEnter2D(Collision2D coll)
