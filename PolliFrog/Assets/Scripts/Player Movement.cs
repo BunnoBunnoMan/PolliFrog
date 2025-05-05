@@ -7,13 +7,13 @@ public class PlayerMovement : MonoBehaviour
     public float moveSpeed;
     public float topSpeed;
     public int yumpForce;
+    public int yumpGrav;
     private bool moving = false;
     private bool yumpies = false;
     private bool yumping = false;
     void Update()
     {
         movement.x = Input.GetAxisRaw("Horizontal");
-        Debug.Log(Input.GetAxisRaw("Horizontal"));
         if (Input.GetAxisRaw("Horizontal") != 0) moving = true;
         else moving = false;
         if (Input.GetKeyDown(KeyCode.W)) yumpies = true;
@@ -23,16 +23,20 @@ public class PlayerMovement : MonoBehaviour
     private void FixedUpdate()
     {
         movement = Vector2.ClampMagnitude(movement, 1);
-        bodydump.AddForce(movement * moveSpeed);
+        if (!yumping) bodydump.AddForce(movement * moveSpeed);
+        else if (yumping) bodydump.AddForce(movement * (moveSpeed / 5));
         if (yumpies && !yumping) bodydump.AddForceY(yumpForce, ForceMode2D.Impulse);
         /*--------------------Top-Speed-&-Dampening--------------------*/
         if (bodydump.linearVelocityX > topSpeed) bodydump.linearVelocityX = topSpeed;
         else if (bodydump.linearVelocityX < -topSpeed) bodydump.linearVelocityX = -topSpeed;
-        if ((bodydump.linearVelocityX > 0 || bodydump.linearVelocityX < -1) && !moving) bodydump.linearDamping = topSpeed/2;
+        if ((bodydump.linearVelocityX > 0 || bodydump.linearVelocityX < -1) && !yumping && !moving) bodydump.linearDamping = topSpeed/2;
         else bodydump.linearDamping = 0;
+        /*---------------------Yumping-Regulations---------------------*/
+        if (yumping && !yumpies) bodydump.gravityScale = yumpGrav;
+        else bodydump.gravityScale = 1;
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    private void OnCollisionStay2D(Collision2D collision)
     {
         if (collision.collider.tag != "Enemy") yumping = false;
     }

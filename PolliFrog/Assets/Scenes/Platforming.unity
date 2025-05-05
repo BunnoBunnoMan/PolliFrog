@@ -936,6 +936,8 @@ MonoBehaviour:
   bodydump: {fileID: 629563091}
   moveSpeed: 50
   topSpeed: 20
+  yumpForce: 5
+  yumpGrav: 4
 --- !u!50 &629563091
 Rigidbody2D:
   serializedVersion: 5
