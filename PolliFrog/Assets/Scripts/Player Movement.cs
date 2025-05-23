@@ -1,9 +1,11 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
     private Vector2 movement;
     public Rigidbody2D bodydump; //I go down da body dump, weeeeeeeeeeeeeeeeeeeeeeeeeeeeeooooooooooooooooooooohhhhhh
+    public Collider2D playerColl;
     public float moveSpeed;
     public float topSpeed;
     public int yumpForce;
@@ -24,7 +26,11 @@ public class PlayerMovement : MonoBehaviour
     {
         movement = Vector2.ClampMagnitude(movement, 1);
         if (!yumping) bodydump.AddForce(movement * moveSpeed);
-        else if (yumping) bodydump.AddForce(movement * (moveSpeed / 5));
+        else if (yumping)
+        {
+            bodydump.AddForce(movement * (moveSpeed / 2));
+            Debug.Log(bodydump.linearVelocityY);
+        }
         if (yumpies && !yumping) bodydump.AddForceY(yumpForce, ForceMode2D.Impulse);
         /*--------------------Top-Speed-&-Dampening--------------------*/
         if (bodydump.linearVelocityX > topSpeed) bodydump.linearVelocityX = topSpeed;
@@ -33,16 +39,19 @@ public class PlayerMovement : MonoBehaviour
         else bodydump.linearDamping = 0;
         /*---------------------Yumping-Regulations---------------------*/
         if (yumping && !yumpies) bodydump.gravityScale = yumpGrav;
+        else if (yumping && bodydump.linearVelocityY <= 5) bodydump.gravityScale = yumpGrav + 2;
         else bodydump.gravityScale = 1;
     }
 
-    private void OnCollisionStay2D(Collision2D collision)
+    private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.collider.tag != "Enemy") yumping = false;
+        if (collision.collider.CompareTag("Ground")) yumping = false;
+        Debug.Log("Collided");
     }
 
     private void OnCollisionExit2D(Collision2D collision)
     {
         yumping = true;
+        Debug.Log("No");
     }
 }
